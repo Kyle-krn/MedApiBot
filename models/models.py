@@ -3,14 +3,15 @@ from tortoise import Model, fields
 
 class UserModel(Model):
     id: int = fields.IntField(pk=True)
+    tg_id: int = fields.BigIntField()
     username: str = fields.CharField(max_length=255, null=True)
     first_name: str = fields.CharField(max_length=255, null=True)
     last_name: str = fields.CharField(max_length=255, null=True)
     male: bool = fields.BooleanField(null=True)
-    age: int = fields.IntField(null=True)
-    country: str = fields.CharField(max_length=255, null=True)
-    city: str = fields.CharField(max_length=255, null=True)
-
+    year_of_birth: int = fields.IntField(null=True)
+    language: str = fields.CharField(max_length=10, null=True)
+    location: str = fields.CharField(max_length=255, null=True)
+    
     class Meta:
         table = "users"
 
