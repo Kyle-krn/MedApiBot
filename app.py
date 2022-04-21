@@ -11,7 +11,7 @@ async def on_startup(dispatcher):
     # Устанавливаем дефолтные команды
     await set_default_commands(dispatcher)
     await db.init(config=TORTOISE_ORM)
-    await db.generate_schemas()
+    # await db.generate_schemas()
     # Уведомляет про запуск
     # await on_startup_notify(dispatcher)
 

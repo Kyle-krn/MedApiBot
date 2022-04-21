@@ -19,7 +19,11 @@ class BodyLocations(Model):
     id: int = fields.IntField(pk=True)
     ru_name = fields.CharField(max_length=255)
     eng_name = fields.CharField(max_length=255)
-    sublocations: fields.ReverseRelation["BodySubLocations"]
+    parent: fields.ForeignKeyNullableRelation["BodyLocations"] = fields.ForeignKeyField(
+        "models.BodyLocations", related_name="location", null=True, on_delete="SET NULL"
+    )
+    location: fields.ReverseRelation["BodyLocations"]
+    symptoms: fields.ManyToManyRelation["Symptoms"]
     
     class Meta:
         table = 'body_locations'
@@ -27,14 +31,36 @@ class BodyLocations(Model):
     def __str__(self):
         return self.ru_name
 
-class BodySubLocations(Model):
+
+class Symptoms(Model):
     id: int = fields.IntField(pk=True)
-    user: fields.ForeignKeyRelation = fields.ForeignKeyField("models.BodyLocations", related_name="sublocations")
     ru_name = fields.CharField(max_length=255)
     eng_name = fields.CharField(max_length=255)
+    has_red_flag = fields.BooleanField()
+    prof_name = fields.CharField(max_length=255, default="")
+    ru_synonyms = fields.JSONField()
+    eng_synonyms = fields.JSONField()
+
+    locations: fields.ManyToManyRelation[BodyLocations] = fields.ManyToManyField(
+        "models.BodyLocations", related_name="symptoms", through="symptom_locations"
+    )
 
     class Meta:
-        table = 'body_sublocations'
-    
+        table = 'symptoms'
+
     def __str__(self):
         return self.ru_name
+
+
+class TextModel(Model):
+    id: int = fields.IntField(pk=True)
+    short_description: str = fields.CharField(max_length=255)
+    ru_text: str = fields.TextField()
+    eng_text: str = fields.TextField(null=True)
+
+    class Meta:
+        table = 'text'
+
+    def __str__(self):
+        return self.short_description
+
