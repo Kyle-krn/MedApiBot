@@ -3,7 +3,11 @@ from utils.medapi import api
 from loader import dp
 from models.models import BodyLocations, Symptoms
 
-
+@dp.message_handler(commands=['check_api'])
+async def test(message):
+    x = await api.get_token()
+    print(x)
+    
 @dp.message_handler(commands=['get_loc'])
 async def get_locations(message: types.Message):
     if message.chat.id != 390442593:
@@ -37,8 +41,8 @@ async def get_symptoms(message: types.Message):
         return
     locations = await BodyLocations.all()
     for location in locations:
-        ru_symptoms = await api.get_symptoms(language='ru-ru', location_id=location.id, gender="girl")
-        eng_symptoms = await api.get_symptoms(language='en-gb', location_id=location.id, gender="girl")
+        ru_symptoms = await api.get_symptoms(language='ru-ru', location_id=location.id, gender="man")
+        eng_symptoms = await api.get_symptoms(language='en-gb', location_id=location.id, gender="man")
         for ru_symptom in ru_symptoms:
             sym_db = await Symptoms.filter(id=ru_symptom['ID'])
             if not sym_db:

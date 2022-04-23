@@ -4,6 +4,7 @@ from models.models import UserModel, TextModel
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from keyboards.inline.keyboards import change_gender_keyboard
+from keyboards.inline.med_keyboards import choice_body_location
 
 class UserSettingsState(StatesGroup):
     age = State()
@@ -58,7 +59,7 @@ async def change_gender(call: types.CallbackQuery):
     else:
         area_body_text = await TextModel.get(id=7)
         area_body_text = area_body_text.ru_text if user.language == 'ru' else area_body_text.eng_text
-        return await call.message.edit_text(area_body_text)
+        return await call.message.edit_text(area_body_text, reply_markup=await choice_body_location(user.language))
 
 
 
@@ -72,4 +73,4 @@ async def set_location(message: types.Message, state: FSMContext):
     await state.finish()
     area_body_text = await TextModel.get(id=7)
     area_body_text = area_body_text.ru_text if user.language == 'ru' else area_body_text.eng_text
-    return await message.answer(area_body_text)
+    return await message.answer(area_body_text, reply_markup=await choice_body_location(user.language))

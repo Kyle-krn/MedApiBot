@@ -11,9 +11,14 @@ class UserModel(Model):
     year_of_birth: int = fields.IntField(null=True)
     language: str = fields.CharField(max_length=10, null=True)
     location: str = fields.CharField(max_length=255, null=True)
+
+    symptoms: fields.ManyToManyRelation["Symptoms"]
     
     class Meta:
         table = "users"
+
+
+
 
 
 class BodyLocations(Model):
@@ -46,6 +51,10 @@ class Symptoms(Model):
         "models.BodyLocations", related_name="symptoms", through="symptom_locations"
     )
 
+    user: fields.ManyToManyRelation[UserModel] = fields.ManyToManyField(
+        "models.UserModel", related_name="symptoms", through="symptom_user", backward_key="symptom_id", forward_key="user_id"
+    )
+
     class Meta:
         table = 'symptoms'
 
@@ -53,9 +62,19 @@ class Symptoms(Model):
         return self.ru_name
 
 
+class UserSymptoms(Model):
+    id: int = fields.IntField(pk=True)
+    user = fields.ForeignKeyField("models.UserModel")
+    symptom = fields.ForeignKeyField("models.Symptoms")
+    sublocation = fields.ForeignKeyField("models.BodyLocations")
+
+    class Meta:
+        table = 'symptom_user'
+
+
 class TextModel(Model):
     id: int = fields.IntField(pk=True)
-    short_description: str = fields.CharField(max_length=255)
+    short_description: str = fields.CharField(max_length=255, null=True)
     ru_text: str = fields.TextField()
     eng_text: str = fields.TextField(null=True)
 
@@ -65,3 +84,35 @@ class TextModel(Model):
     def __str__(self):
         return self.short_description
 
+
+class TextButtonModel(Model):
+    id: int = fields.IntField(pk=True)
+    short_description: str = fields.CharField(max_length=255, null=True)
+    ru_text: str = fields.TextField()
+    eng_text: str = fields.TextField(null=True)
+
+    class Meta:
+        table = 'button_text'
+
+    def __str__(self):
+        return self.short_description
+
+
+class SuccessPayments(Model):
+    id: int = fields.IntField(pk=True)
+    user = fields.ForeignKeyField("models.UserModel")
+    symptom_array = fields.JSONField()
+    diagnosis = fields.TextField(null=True)
+    amount = fields.IntField()
+
+
+class SettingsPayments(Model):
+    id: int = fields.IntField(pk=True)
+    ru_label: str = fields.CharField(max_length=255)
+    eng_label: str = fields.CharField(max_length=255, null=True)
+    amount: int = fields.IntField()
+    url_photo = fields.TextField()
+
+
+    class Meta:
+        table = 'settings_payments'
