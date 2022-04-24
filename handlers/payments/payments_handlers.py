@@ -20,7 +20,7 @@ async def payments_order(call: types.CallbackQuery):
     text = text.format(int(pay_settings.amount / 100))
     title_text = await TextModel.get(id=16)
     title_text = text_message.ru_text if user.language == 'ru' else text_message.eng_text
-    await bot.send_invoice(call.message.chat.id,
+    msg = await bot.send_invoice(call.message.chat.id,
                            title=title_text,
                            description=text,
                            provider_token=PAYMENTS_TOKEN,
@@ -37,7 +37,7 @@ async def payments_order(call: types.CallbackQuery):
                            need_phone_number=False,
                            payload=f"pp",
                            reply_markup=await payments_keyboard(user.language))
-
+    print(msg.message_id)
 
 
 @dp.pre_checkout_query_handler(lambda query: True)
@@ -57,6 +57,7 @@ async def process_successful_payment(message: types.Message):
                                 male=user.male, 
                                 symptoms=symptoms_list, 
                                 year_of_birth=user.year_of_birth)
+    await bot.delete_message(message.chat.id, message.message_id-1)
     print(resp)
     if resp == []:
         text = await TextModel.get(id=15)
