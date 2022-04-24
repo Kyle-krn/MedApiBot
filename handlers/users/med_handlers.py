@@ -3,7 +3,7 @@ from multiprocessing import parent_process
 from loader import dp
 from aiogram import types
 from models.models import BodyLocations, TextModel, UserModel, Symptoms, UserSymptoms
-from keyboards.inline.med_keyboards import choice_body_sublocation, choice_body_location, choice_symptoms_keyboard, symptoms_control_keyboard
+from keyboards.inline.med_keyboards import choice_body_sublocation, choice_body_location, choice_symptoms_keyboard, symptoms_control_keyboard, change_settings_keyboards
 from tortoise.queryset import Q
 from utils.medapi import api
 from pprint import PrettyPrinter

@@ -10,8 +10,10 @@ class UserModel(Model):
     male: bool = fields.BooleanField(null=True)
     year_of_birth: int = fields.IntField(null=True)
     language: str = fields.CharField(max_length=10, null=True)
-    location: str = fields.CharField(max_length=255, null=True)
-
+    # location: str = fields.CharField(max_length=255, null=True)
+    location_country: str = fields.CharField(max_length=255, null=True)
+    location_city: str = fields.CharField(max_length=255, null=True)
+    free_tries: int = fields.IntField(default=0)
     symptoms: fields.ManyToManyRelation["Symptoms"]
     
     class Meta:

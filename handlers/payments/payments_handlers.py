@@ -11,10 +11,12 @@ async def payments_order(call: types.CallbackQuery):
     await call.message.edit_reply_markup(reply_markup=None)
     pay_settings = await SettingsPayments.get(id=1)
     user = await UserModel.get(tg_id=call.message.chat.id)
+    if user.free_tries > 0:
+        return await free_tries_handler(call)
+
     label = pay_settings.ru_label if user.language == 'ru' else pay_settings.eng_label
     # amount = pay_settings.amount
     prices = [types.LabeledPrice(label=label, amount=pay_settings.amount)]
-    
     text_message = await TextModel.get(id=13)
     text = text_message.ru_text if user.language == 'ru' else text_message.eng_text
     text = text.format(int(pay_settings.amount / 100))
@@ -49,6 +51,33 @@ async def checkout(pre_checkout_query: types.PreCheckoutQuery):
 
 
 
+async def free_tries_handler(call: types.CallbackQuery):
+    user = await UserModel.get(tg_id=call.message.chat.id)
+    symptoms_list = list(set([i.id for i in await user.symptoms.all()]))
+    resp = await api.get_diagnosis(language='ru-ru' if user.language == 'ru' else 'en-gb', 
+                                male=user.male, 
+                                symptoms=symptoms_list, 
+                                year_of_birth=user.year_of_birth)
+    
+    if resp == []:
+        user.free_tries -= 1
+        text = await TextModel.get(id=20)
+        text = text.ru_text if user.language == 'ru' else text.eng_text
+        text = text.format(count=user.free_tries)
+    else:
+        user.free_tries = 0
+        text = await TextModel.get(id=14)
+        text = text.ru_text if user.language == 'ru' else text.eng_text
+        text = text.format(resp[0]['Issue']['Accuracy'], resp[0]['Issue']['Name'], ", ".join([i['Name'] for i in resp[0]['Specialisation']]))
+    
+    await user.save()
+    await UserSymptoms.filter(user=user).delete()
+    await bot.send_message(
+        call.message.chat.id,
+        text,
+        reply_markup=await new_calculation_keyboard(user.language, "new_calculation:")
+        )
+
 @dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT)
 async def process_successful_payment(message: types.Message):
     user = await UserModel.get(tg_id=message.chat.id)
@@ -58,10 +87,16 @@ async def process_successful_payment(message: types.Message):
                                 symptoms=symptoms_list, 
                                 year_of_birth=user.year_of_birth)
     await bot.delete_message(message.chat.id, message.message_id-1)
-    print(resp)
     if resp == []:
-        text = await TextModel.get(id=15)
+        if user.free_tries == 0:
+            user.free_tries = 10
+        # else:
+        #     user.free_tries -= 1
+        
+        await user.save()
+        text = await TextModel.get(id=20)
         text = text.ru_text if user.language == 'ru' else text.eng_text
+        text = text.format(count=user.free_tries)
     else:
         text = await TextModel.get(id=14)
         text = text.ru_text if user.language == 'ru' else text.eng_text

@@ -85,17 +85,22 @@ async def symptoms_control_keyboard(language:str):
     keyboard.add(types.InlineKeyboardButton(text=btn2_text, callback_data="clear_symptoms:"))
 
     # keyboard = types.InlineKeyboardMarkup()
-    btn1_text = await TextButtonModel.get(id=1)
-    btn2_text = await TextButtonModel.get(id=2)
-    keyboard.add(types.InlineKeyboardButton(text=btn1_text.ru_text if language == 'ru' else btn1_text.eng_text, 
-                                            callback_data="change_age:"))
-    keyboard.add(types.InlineKeyboardButton(text=btn2_text.ru_text if language == 'ru' else btn2_text.eng_text, 
-                                            callback_data="change_language:"))
-
-
-
+    # btn1_text = await TextButtonModel.get(id=1)
+    # btn2_text = await TextButtonModel.get(id=2)
+    # keyboard.add(types.InlineKeyboardButton(text=btn1_text.ru_text if language == 'ru' else btn1_text.eng_text, 
+    #                                         callback_data="change_age:"))
+    # keyboard.add(types.InlineKeyboardButton(text=btn2_text.ru_text if language == 'ru' else btn2_text.eng_text, 
+    #                                         callback_data="change_language:"))
     return keyboard
 
+
+async def change_settings_keyboards(language):
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1_text = await TextButtonModel.get(id=1)
+    btn2_text = await TextButtonModel.get(id=2)
+    keyboard.add(types.KeyboardButton(text=btn1_text.ru_text if language == 'ru' else btn1_text.eng_text),
+                 types.KeyboardButton(text=btn2_text.ru_text if language == 'ru' else btn2_text.eng_text))
+    return keyboard
 
 
 async def new_calculation_keyboard(language:str, callback_data: str):
