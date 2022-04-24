@@ -31,7 +31,8 @@ async def choice_symptoms_keyboard(user: UserModel,
                                    symptoms: List[Symptoms], 
                                    page: int, 
                                    max_page: int, 
-                                   sublocation_id: int):
+                                   sublocation_id: int,
+                                   parent_location_id: int):
     keyboard = types.InlineKeyboardMarkup()
     user_symptoms = await user.symptoms.all()
     for item in symptoms:
@@ -56,7 +57,14 @@ async def choice_symptoms_keyboard(user: UserModel,
     text = await TextButtonModel.get(id=7)
     text = text.ru_text if user.language == 'ru' else text.eng_text
     keyboard.add(types.InlineKeyboardButton(text=text, 
-                                                callback_data=f"apply_symptom:"))
+                                                callback_data=f"apply_symptom:"))    
+    
+    
+    
+    btn_text = await TextButtonModel.get(id=5)
+    btn_text = btn_text.ru_text if user.language == 'ru' else btn_text.eng_text
+    keyboard.add(types.InlineKeyboardButton(text=btn_text, 
+                                            callback_data=f"general_location:{parent_location_id}"))
     return keyboard
 
 
@@ -84,15 +92,17 @@ async def symptoms_control_keyboard(language:str):
     keyboard.add(types.InlineKeyboardButton(text=btn2_text.ru_text if language == 'ru' else btn2_text.eng_text, 
                                             callback_data="change_language:"))
 
+
+
     return keyboard
 
 
 
-async def new_calculation_keyboard(language:str):
+async def new_calculation_keyboard(language:str, callback_data: str):
     keyboard = types.InlineKeyboardMarkup()
 
     btn_text = await TextButtonModel.get(id=11)
     btn_text = btn_text.ru_text if language == 'ru' else btn_text.eng_text
-    keyboard.add(types.InlineKeyboardButton(btn_text,callback_data="back_general_location:"))
+    keyboard.add(types.InlineKeyboardButton(btn_text,callback_data=callback_data))
     return keyboard
 # 

@@ -80,9 +80,13 @@ async def change_gender(call: types.CallbackQuery):
     gender = call.data.split(':')[1]
     if gender == 'male':
         user.male = True
+        gender_text = await TextModel.get(id=19)
     if gender == 'female':
         user.male = False
+        gender_text = await TextModel.get(id=18)
     await user.save()
+    gender_text = gender_text.ru_text if user.language == 'ru' else gender_text.eng_text
+    await call.answer(gender_text)
     if not user.location:
         await UserSettingsState.location.set()
         location_text = await TextModel.get(id=6)

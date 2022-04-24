@@ -24,7 +24,7 @@ async def bot_start(message: types.Message):
         language_text = language_text.ru_text if user.language else language_text.eng_text
         await message.answer(language_text, reply_markup=await language_keyboard())
     else:
-        await message.answer(start_text.ru_text, reply_markup=await new_calculation_keyboard(user.language))
+        await message.answer(start_text.ru_text, reply_markup=await new_calculation_keyboard(user.language, 'back_general_location:'))
         
 
 

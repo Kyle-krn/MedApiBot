@@ -57,6 +57,7 @@ async def process_successful_payment(message: types.Message):
                                 male=user.male, 
                                 symptoms=symptoms_list, 
                                 year_of_birth=user.year_of_birth)
+    print(resp)
     if resp == []:
         text = await TextModel.get(id=15)
         text = text.ru_text if user.language == 'ru' else text.eng_text
@@ -73,6 +74,6 @@ async def process_successful_payment(message: types.Message):
     await bot.send_message(
         message.chat.id,
         text,
-        reply_markup=await new_calculation_keyboard(user.language)
+        reply_markup=await new_calculation_keyboard(user.language, "new_calculation:")
         )
     

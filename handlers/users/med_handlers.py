@@ -65,7 +65,8 @@ async def symptoms_handler(call: types.CallbackQuery):
                                                                                                symptoms=symptoms, 
                                                                                                page=page, 
                                                                                                max_page=max_page,
-                                                                                               sublocation_id=sublocation_id))
+                                                                                               sublocation_id=sublocation_id,
+                                                                                               parent_location_id=parent_location.id))
 # @dp.callback_query_handler(lambda call: call.data.split(':')[0] == 'general_location')
 
 
@@ -152,3 +153,15 @@ async def find_diagnosis_handler(message: types.Message):
     print(text)
     # if resp == []:
     #     pass
+
+
+
+@dp.callback_query_handler(lambda call: call.data.split(':')[0] == 'new_calculation')
+# @dp.callback_query_handler(lambda call: call.data.split(':')[0] == 'clear')
+async def new_calculation_handler(call: types.CallbackQuery):
+    user = await UserModel.get(tg_id=call.message.chat.id)
+    text = ''
+    area_body_text = await TextModel.get(id=7)
+    text += area_body_text.ru_text if user.language == 'ru' else area_body_text.eng_text
+    await call.message.edit_reply_markup(reply_markup=None)
+    return await call.message.answer(text, reply_markup=await choice_body_location(user.language))
