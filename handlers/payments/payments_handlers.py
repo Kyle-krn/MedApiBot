@@ -8,7 +8,7 @@ from utils.medapi import api
 
 @dp.callback_query_handler(lambda call: call.data.split(':')[0] == 'find_diagnosis')
 async def payments_order(call: types.CallbackQuery):
-    await call.message.delete()
+    await call.message.edit_reply_markup(reply_markup=None)
     pay_settings = await SettingsPayments.get(id=1)
     user = await UserModel.get(tg_id=call.message.chat.id)
     label = pay_settings.ru_label if user.language == 'ru' else pay_settings.eng_label
