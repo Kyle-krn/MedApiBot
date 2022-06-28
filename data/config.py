@@ -14,7 +14,10 @@ PORT = env.int("PORT")  # Тоже str, но для айпи адреса хос
 HOST= env.str("HOST")
 
 PAYMENTS_TOKEN = env.str("PAYMENTS_TOKEN")
-print(PAYMENTS_TOKEN)
+
+API_URL = env.str("API_URL")
+API_TOKEN = env.str("API_TOKEN")
+
 POSTGRES_URI = f"postgres://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 
 TORTOISE_ORM = {
